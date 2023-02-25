@@ -1,0 +1,117 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#includeEtc "caseDicts/mesh/generation/snappyHexMeshDict.cfg"
+
+castellatedMesh on;
+snap            on;
+addLayers       off;
+
+geometry
+{
+    buildings
+    {
+        type triSurfaceMesh;
+        file "buildings.stl";
+    }
+
+    refinementCylinderA
+    {
+        type searchableCylinder;
+	point1          (0 0 0);
+	point2          (0 0 370);
+	radius          360;
+    }
+    
+    refinementCylinderB
+    {
+        type searchableCylinder;
+	point1          (0 0 0);
+	point2          (0 0 8);
+	radius          360;
+    }
+};
+
+castellatedMeshControls
+{
+    features
+    (
+      { file  "buildings.eMesh"; level 1; }
+    );
+
+    refinementSurfaces
+    {
+        buildings
+        {
+            level (2 2);
+            patchInfo { type wall; }
+        }
+    }
+
+    refinementRegions
+    {
+        refinementCylinderA
+        {
+            mode    inside;
+            level   3; 
+        }
+        
+        refinementCylinderB
+        {
+            mode    inside;
+            level   4; 
+        }
+    }
+
+    locationInMesh (-849.217 -2052.98 3.001);
+}
+
+snapControls
+{
+    explicitFeatureSnap    true;
+    implicitFeatureSnap    false;
+}
+
+addLayersControls
+{
+    layers
+    {
+        "CAD.*"
+        {
+            nSurfaceLayers 2;
+        }
+    }
+
+    relativeSizes       true;
+    expansionRatio      1.2;
+    finalLayerThickness 0.5;
+    minThickness        1e-3;
+}
+
+meshQualityControls
+{}
+
+writeFlags
+(
+    // scalarLevels
+    // layerSets
+    // layerFields
+);
+
+mergeTolerance 1e-6;
+
+// ************************************************************************* //
+
+
